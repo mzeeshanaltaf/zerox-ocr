@@ -44,7 +44,7 @@ faq_data = {
             </ul>
         </p>""",
 
-        'Can I get the application source code?': '<p>Yes, Source code of this application is available at: <a href="https://github.com/mzeeshanaltaf/">GitHub</a></p>',
+        'Can I get the application source code?': '<p>Yes, Source code of this application is available at: <a href="https://github.com/mzeeshanaltaf/zerox-ocr/">GitHub</a></p>',
 
     }
 

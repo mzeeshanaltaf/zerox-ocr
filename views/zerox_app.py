@@ -1,6 +1,7 @@
 import streamlit as st
 from util import *
-import os
+import asyncio
+from datetime import datetime
 
 if "openai_api_key" not in st.session_state:
     st.session_state.openai_api_key = None
@@ -11,6 +12,12 @@ if "gemini_api_key" not in st.session_state:
     st.session_state.gemini_api_key = None
 if "groq_api_key" not in st.session_state:
         st.session_state.groq_api_key = None
+
+if "markdown_zerox" not in st.session_state:
+    st.session_state.markdown_zerox = None
+    st.session_state.input_tokens = None
+    st.session_state.output_tokens = None
+    st.session_state.zerox_ocr_time = None
 
 page_title = "DocuVision 📄🔍✨"
 page_icon = "📄"
@@ -26,45 +33,8 @@ your workflow, making document management effortless and accessible.🚀
 st.info("This application is powered by [Zerox OCR](https://github.com/getomni-ai/zerox). "
         "Popular toolkit for document OCR'ing.", icon=':material/info:')
 
-st.subheader('Select the LLM:')
-model_provider = st.selectbox('Choose the LLM Provider:', ('OpenAI', 'Azure', 'Google', 'Groq'))
-
-model = '' # Variable to keep track of selected model
-api_key_status = False # Variable to disable PDF uploading if key is none
-
-if model_provider == 'OpenAI':
-    if st.session_state.openai_api_key is None:
-        st.warning('API Key not set. Configure the OpenAI API key from Configuration page.👈', icon=':material/warning:')
-    else:
-        model = st.pills('Select the Vision Model:', ['gpt-4o-mini', 'gpt-4o'], selection_mode='single', default='gpt-4o-mini')
-        os.environ["OPENAI_API_KEY"] = st.session_state.openai_api_key
-        api_key_status = True
-
-if model_provider == 'Azure':
-    if st.session_state.azure_api_key is None or st.session_state.azure_ep is None:
-        st.warning('API or Endpoint is not configured. Configure the Azure API or Endpoint from Configuration page.👈', icon=':material/warning:')
-    else:
-        model = st.pills('Select the Vision Model:', ['gpt-4o'], selection_mode='single', default='gpt-4o')
-        os.environ["AZURE_API_KEY"] = st.session_state.azure_api_key
-        os.environ["AZURE_API_BASE"] = st.session_state.azure_ep
-        os.environ["AZURE_API_VERSION"] = "2023-05-15"
-        api_key_status = True
-
-if model_provider == 'Google':
-    if st.session_state.gemini_api_key is None:
-        st.warning('API Key not set. Configure the Google Gemini API key from Configuration page.👈', icon=':material/warning:')
-    else:
-        model = st.pills('Select the Vision Model:', ['gemini-1.5-flash', 'gemini-1.5-pro'], selection_mode='single', default='gemini-1.5-flash')
-        os.environ['GEMINI_API_KEY'] = st.session_state.gemini_api_key
-        api_key_status = True
-
-if model_provider == 'Groq':
-    if st.session_state.groq_api_key is None:
-        st.warning('API Key not set. Configure the Groq API key from Configuration page.👈', icon=':material/warning:')
-    else:
-        model = st.pills('Select the Vision Model:', ['llama-3.2-90b-vision-preview'], selection_mode='single', default='llama-3.2-90b-vision-preview')
-        os.environ['GROQ_API_KEY'] = st.session_state.groq_api_key
-        api_key_status = True
+# Select the LLM model
+model_name, api_key_status = model_selection()
 
 # File uploader
 st.subheader("Upload a PDF file:", divider='gray')
@@ -77,8 +47,44 @@ if uploaded_pdf is not None:
     with open(temp_file, "wb") as file:
         file.write(uploaded_pdf.getvalue())
 
-    st.subheader('PDF Previewer:', divider='gray')
-    with st.expander(':blue[***Preview PDF***]', expanded=False, icon=':material/preview:'):
-        display_pdf(uploaded_pdf)
+    # Reset the variables if new PDF is loaded.
+    st.session_state.markdown_zerox = None
+    st.session_state.input_tokens = None
+    st.session_state.output_tokens = None
+    st.session_state.zerox_ocr_time = None
+
+    col1, col2 = st.columns([1, 1], vertical_alignment="top")
+
+    # OCR with Zerox toolkit
+    with (col1):
+        st.subheader('OCR with Zerox:', divider='gray')
+        run_ocr_zerox = st.button("Run OCR", type="primary", key="run_ocr_zerox", disabled=not uploaded_pdf)
+        if run_ocr_zerox:
+            with st.spinner('Processing ...'):
+                st.session_state.markdown_zerox, st.session_state.zerox_ocr_time, st.session_state.input_tokens,\
+                st.session_state.output_tokens = asyncio.run(perform_ocr_zerox(temp_file, model_name))
+
+        # Display the markdown response and statistics of Zerox
+        if st.session_state.markdown_zerox is not None:
+            st.subheader('Statistics:', divider='gray')
+            col3, col4, col5 = st.columns(3)
+            col3.metric('Time Taken (sec)', f'{st.session_state.zerox_ocr_time:.2f}')
+            col4.metric('Input Tokens', st.session_state.input_tokens)
+            col5.metric('Output Tokens', st.session_state.output_tokens)
+            st.subheader('Response:', divider='gray')
+
+            with st.expander('Markdown Response', expanded=True, icon=':material/markdown:'):
+                zerox_container = st.container(height=1000, key='zerox-container')
+                zerox_container.markdown(st.session_state.markdown_zerox, unsafe_allow_html=True)
+
+                # Create a unique file name based on current date & time for download
+                file_name = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                st.download_button("Download", data=st.session_state.markdown_zerox,file_name=f"{file_name}_zerox.md",
+                                   type='primary', icon=':material/markdown:', help='Download the Markdown Response')
+
+    with col2:
+        st.subheader('PDF Previewer:', divider='gray')
+        with st.expander(':blue[***Preview PDF***]', expanded=False, icon=':material/preview:'):
+            display_pdf(uploaded_pdf)
 
 display_footer()
