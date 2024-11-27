@@ -47,6 +47,9 @@ if uploaded_pdf is not None:
     with open(temp_file, "wb") as file:
         file.write(uploaded_pdf.getvalue())
 
+    pages = read_pdf_pages(temp_file)
+    st.write(pages)
+
     # Reset the variables if new PDF is loaded.
     st.session_state.markdown_zerox = None
     st.session_state.input_tokens = None
