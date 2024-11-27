@@ -2,3 +2,4 @@ streamlit
 py-zerox
 email-validator
 captcha
+pdfplumber
