@@ -2,6 +2,7 @@ import streamlit as st
 import base64
 from pyzerox import zerox
 import os
+import pdfplumber
 
 # Function for selecting LLM Model
 def model_selection():
@@ -112,3 +113,10 @@ def display_footer():
     </div>
     """
     st.sidebar.markdown(footer, unsafe_allow_html=True)
+
+
+def read_pdf_pages(file_path):
+    # Open the PDF file
+    with pdfplumber.open(file_path) as pdf:
+        total_pages = len(pdf.pages)
+    return total_pages
