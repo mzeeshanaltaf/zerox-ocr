@@ -68,8 +68,6 @@ async def perform_ocr_zerox(source, model):
     custom_system_prompt = None  # System prompt to use for the vision model
     select_pages = None  ## None for all, but could be int or list(int) page numbers (1 indexed)
 
-    st.write(model)
-
     result = await zerox(file_path=source, model=model,
                          custom_system_prompt=custom_system_prompt, select_pages=select_pages, **kwargs)
 
