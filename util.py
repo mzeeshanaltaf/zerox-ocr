@@ -2,7 +2,6 @@ import streamlit as st
 import base64
 from pyzerox import zerox
 import os
-import pdfplumber
 import streamlit.components.v1 as components
 
 # Function for selecting LLM Model
@@ -61,16 +60,6 @@ def model_selection():
 
     return model_name, api_key_status
 
-# Function to display the PDF of a given file
-def display_pdf(file):
-    # Reading the uploaded file
-    base64_pdf = base64.b64encode(file.read()).decode('utf-8')
-
-    # Embedding PDF in HTML
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#toolbar=0" width="100%" height="700" type="application/pdf"></iframe>'
-
-    # Displaying the PDF
-    st.markdown(pdf_display, unsafe_allow_html=True)
 
 # Function to perform OCR using zerox ocr engine
 async def perform_ocr_zerox(source, model):
@@ -92,40 +81,8 @@ async def perform_ocr_zerox(source, model):
 
     return markdown_format, completion_time, result.input_tokens, result.output_tokens
 
-
-def display_footer():
-    footer = """
-    <style>
-    /* Ensures the footer stays at the bottom of the sidebar */
-    [data-testid="stSidebar"] > div: nth-child(3) {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        text-align: center;
-    }
-
-    .footer {
-        color: grey;
-        font-size: 15px;
-        text-align: center;
-        background-color: transparent;
-    }
-    </style>
-    <div class="footer">
-    Made with ❤️ by <a href="mailto:zeeshan.altaf@92labs.ai">Zeeshan</a>.
-    </div>
-    """
-    st.sidebar.markdown(footer, unsafe_allow_html=True)
-
-
-def read_pdf_pages(file_path):
-    with pdfplumber.open(file_path) as pdf:
-        for page_number, page in enumerate(pdf.pages, start=1):
-            st.write(f"Page {page_number}:")
-            st.write(page.extract_text())  # Extract text from the current page
-            st.write("\n" + "="*50 + "\n")
-
-def display_pdf_with_pdfjs(file):
+# Function to display PDF preview. Use of iFrame method to display PDF preview is blocked by Chrome Browser
+def display_pdf(file):
     # Convert file to base64
     base64_pdf = base64.b64encode(file.read()).decode('utf-8')
 
@@ -195,3 +152,28 @@ def display_pdf_with_pdfjs(file):
 
     # Embed the HTML into Streamlit
     components.html(pdf_js_code, height=800, scrolling=True)
+
+# Display footer in the sidebar
+def display_footer():
+    footer = """
+    <style>
+    /* Ensures the footer stays at the bottom of the sidebar */
+    [data-testid="stSidebar"] > div: nth-child(3) {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .footer {
+        color: grey;
+        font-size: 15px;
+        text-align: center;
+        background-color: transparent;
+    }
+    </style>
+    <div class="footer">
+    Made with ❤️ by <a href="mailto:zeeshan.altaf@92labs.ai">Zeeshan</a>.
+    </div>
+    """
+    st.sidebar.markdown(footer, unsafe_allow_html=True)
