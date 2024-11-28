@@ -88,6 +88,6 @@ if uploaded_pdf is not None:
     with col2:
         st.subheader('PDF Previewer:', divider='gray')
         with st.expander(':blue[***Preview PDF***]', expanded=False, icon=':material/preview:'):
-            display_pdf(uploaded_pdf)
+            display_pdf_with_pdfjs(uploaded_pdf)
 
 display_footer()
