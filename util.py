@@ -200,6 +200,7 @@ async def perform_ocr_zerox(source, model):
 
     pages = read_pdf_pages(source)
     st.write(pages)
+    st.write(source)
     return None, None, None, None
 
     # result = await zerox(file_path=source, model=model,
