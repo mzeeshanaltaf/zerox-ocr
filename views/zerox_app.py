@@ -40,7 +40,7 @@ model_name, api_key_status = model_selection()
 st.subheader("Upload a PDF file:", divider='gray')
 uploaded_pdf = st.file_uploader("Upload a PDF file", type=["pdf"], label_visibility="collapsed", disabled=not api_key_status)
 
-# If pdf file is not none then save the contents of the pdf file into temp file and preview the pdf
+# If pdf file is not none then save the contents of the pdf file into temp file
 if uploaded_pdf is not None:
     # Save the contents of the uploaded file into temp file
     temp_file = "./temp.pdf"
@@ -82,9 +82,11 @@ if uploaded_pdf is not None:
                 st.download_button("Download", data=st.session_state.markdown_zerox,file_name=f"{file_name}_zerox.md",
                                    type='primary', icon=':material/markdown:', help='Download the Markdown Response')
 
+    # Display PDF Previewer
     with col2:
         st.subheader('PDF Previewer:', divider='gray')
         with st.expander(':blue[***Preview PDF***]', expanded=False, icon=':material/preview:'):
-            display_pdf_with_pdfjs(uploaded_pdf)
+            display_pdf(uploaded_pdf)
 
+# Display footer on the sidebar
 display_footer()

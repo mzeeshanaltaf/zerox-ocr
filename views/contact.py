@@ -49,14 +49,13 @@ captcha_input = None  # initiate CAPTCHA
 ## CAPTCHA
 with col2:  # right side of the layout
     st.info(' CAPTCHAs are in place to block automated submissions.', icon="ℹ️")
-    captcha_placeholder = st.empty()
-    captcha_placeholder.image(captcha_image, use_container_width=True)
 
-    if st.button("Refresh", type="secondary",
-                 use_container_width=True):  # option to refresh CAPTCHA without refreshing the page
+    if st.button("Refresh", type="secondary", use_container_width=True):  # option to refresh CAPTCHA without refreshing the page
         st.session_state.captcha_text = generate_captcha()
         captcha_text, captcha_image = st.session_state.captcha_text
-        captcha_placeholder.image(captcha_image, use_container_width=True)
+
+    captcha_placeholder = st.empty()
+    captcha_placeholder.image(captcha_image, use_container_width=True)
 
     captcha_input = st.text_input("Enter the CAPTCHA")  # box to insert CAPTCHA
 

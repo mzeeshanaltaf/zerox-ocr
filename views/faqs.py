@@ -8,9 +8,10 @@ st.set_page_config(page_title=page_title, page_icon=page_icon, layout="wide", in
 
 st.title('FAQs')
 
+# Toggle switch to expand all FAQs.
 expand_all = st.toggle("Expand all", value=False)
 
-
+# Dictionary to store FAQs
 faq_data = {
         'What this Application is about?': '<p>This application takes a PDF document and extract text, tables, formulas from it with '
                                            'precision and deliver it in a clean and structured markdown format. '
