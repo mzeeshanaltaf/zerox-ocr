@@ -241,10 +241,11 @@ def display_footer():
 
 
 def read_pdf_pages(file_path):
-    # Open the PDF file
     with pdfplumber.open(file_path) as pdf:
-        total_pages = len(pdf.pages)
-    return total_pages
+        for page_number, page in enumerate(pdf.pages, start=1):
+            st.write(f"Page {page_number}:")
+            st.write(page.extract_text())  # Extract text from the current page
+            st.write("\n" + "="*50 + "\n")
 
 def display_pdf_with_pdfjs(file):
     # Convert file to base64
