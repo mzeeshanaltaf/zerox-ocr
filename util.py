@@ -79,16 +79,19 @@ async def perform_ocr_zerox(source, model):
     custom_system_prompt = None  # System prompt to use for the vision model
     select_pages = None  ## None for all, but could be int or list(int) page numbers (1 indexed)
 
-    result = await zerox(file_path=source, model=model,
-                         custom_system_prompt=custom_system_prompt, select_pages=select_pages, **kwargs)
+    read_pdf_pages(source)
+    st.write(model)
+    return None, None, None, None
+    # result = await zerox(file_path=source, model=model,
+    #                      custom_system_prompt=custom_system_prompt, select_pages=select_pages, **kwargs)
 
-    # Get the content of all the pages
-    for i in range(len(result.pages)):
-        markdown_format += result.pages[i].content
+    # # Get the content of all the pages
+    # for i in range(len(result.pages)):
+    #     markdown_format += result.pages[i].content
 
-    completion_time = result.completion_time / 1000
+    # completion_time = result.completion_time / 1000
 
-    return markdown_format, completion_time, result.input_tokens, result.output_tokens
+    # return markdown_format, completion_time, result.input_tokens, result.output_tokens
 
 
 def display_footer():
