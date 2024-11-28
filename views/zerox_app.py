@@ -64,8 +64,10 @@ if uploaded_pdf is not None:
         run_ocr_zerox = st.button("Run OCR", type="primary", key="run_ocr_zerox", disabled=not uploaded_pdf)
         if run_ocr_zerox:
             with st.spinner('Processing ...'):
-                st.session_state.markdown_zerox, st.session_state.zerox_ocr_time, st.session_state.input_tokens,\
-                st.session_state.output_tokens = asyncio.run(perform_ocr_zerox(temp_file, model_name))
+                pages = read_pdf_pages(temp_file)
+                st.write(pages)
+                # st.session_state.markdown_zerox, st.session_state.zerox_ocr_time, st.session_state.input_tokens,\
+                # st.session_state.output_tokens = asyncio.run(perform_ocr_zerox(temp_file, model_name))
 
         # Display the markdown response and statistics of Zerox
         if st.session_state.markdown_zerox is not None:
